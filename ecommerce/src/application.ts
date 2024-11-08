@@ -12,6 +12,8 @@ import {MySequence} from './sequence';
 import { AuthService } from './services';
 import { MyTokenService } from './services/token.service';
 import { TokenServiceBindings } from '@loopback/authentication-jwt';
+import {AuthenticationComponent, registerAuthenticationStrategy} from '@loopback/authentication';
+import {JWTAuthenticationStrategy} from './middlewares/auth.middleware';
 
 export {ApplicationConfig};
 
@@ -31,6 +33,27 @@ export class EcommerceApplication extends BootMixin(
     this.configure(RestExplorerBindings.COMPONENT).to({
       path: '/explorer',
     });
+
+    // Add this configuration before component(RestExplorerComponent)
+    this.api({
+      openapi: '3.0.0',
+      info: {
+        title: 'Ecommerce API',
+        version: '1.0.0',
+      },
+      paths: {},
+      components: {
+        securitySchemes: {
+          jwt: {
+            type: 'http',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+          },
+        },
+      },
+      security: [{jwt: []}],
+    });
+
     this.component(RestExplorerComponent);
 
     this.bind('services.AuthService').toClass(AuthService);
@@ -46,5 +69,11 @@ export class EcommerceApplication extends BootMixin(
         nested: true,
       },
     };
+
+    // Add authentication
+    this.component(AuthenticationComponent);
+    registerAuthenticationStrategy(this, JWTAuthenticationStrategy);
+
+    this.bind('jwt.secret').to(process.env.JWT_SECRET || 'your-secret-key');
   }
 }

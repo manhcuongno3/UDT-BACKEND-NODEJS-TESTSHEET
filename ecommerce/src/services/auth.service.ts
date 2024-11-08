@@ -7,6 +7,7 @@ import * as bcrypt from 'bcryptjs';
 import { UserProfile, securityId } from '@loopback/security';
 import { UserType } from '../utils/constants';
 import { TokenServiceBindings } from '@loopback/authentication-jwt';
+import { HttpErrors } from '@loopback/rest';
 
 @injectable()
 export class AuthService {
@@ -33,7 +34,7 @@ export class AuthService {
 
   async login(email: string, password: string, userType: UserType): Promise<string> {
     const user = await this.findUserByEmail(email, userType);
-    
+
     if (!user || !(await this.verifyPassword(password, user.password))) {
       throw new Error('Invalid email or password');
     }
@@ -65,7 +66,7 @@ export class AuthService {
   private async verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
     return bcrypt.compare(password, hashedPassword);
   }
-  
+
 
   private createUserProfile(user: any, userType: UserType): UserProfile {
     if (!user || !user.id) {
@@ -76,5 +77,20 @@ export class AuthService {
       email: user.email,
       role: userType,
     };
+  }
+
+  async verifyCredentials(email: string, password: string, userType: UserType): Promise<any> {
+    const user = await this.findUserByEmail(email, userType);
+
+    if (!user) {
+      throw new HttpErrors.Unauthorized('Invalid email');
+    }
+
+    const passwordMatched = await this.verifyPassword(password, user.password);
+    if (!passwordMatched) {
+      throw new HttpErrors.Unauthorized('Invalid password');
+    }
+
+    return user;
   }
 }

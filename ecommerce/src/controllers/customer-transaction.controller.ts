@@ -27,8 +27,10 @@ import {CustomerRepository} from '../repositories';
 export class CustomerTransactionController {
   constructor(
     @repository(CustomerRepository) protected customerRepository: CustomerRepository,
+    @inject(AuthenticationBindings.CURRENT_USER) private currentUser: UserProfile,
   ) { }
 
+  @authenticate('jwt')
   @get('/customers/{id}/transactions', {
     responses: {
       '200': {
@@ -45,9 +47,13 @@ export class CustomerTransactionController {
     @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter<Transaction>,
   ): Promise<Transaction[]> {
+    if (this.currentUser[securityId] !== id) {
+      throw new Error('Access denied: You can only view your own transactions');
+    }
     return this.customerRepository.transactions(id).find(filter);
   }
 
+  @authenticate('jwt')
   @post('/customers/{id}/transactions', {
     responses: {
       '200': {
@@ -69,9 +75,13 @@ export class CustomerTransactionController {
       },
     }) transaction: Omit<Transaction, 'id'>,
   ): Promise<Transaction> {
+    if (this.currentUser[securityId] !== id) {
+      throw new Error('Access denied: You can only create transactions for yourself');
+    }
     return this.customerRepository.transactions(id).create(transaction);
   }
 
+  @authenticate('jwt')
   @patch('/customers/{id}/transactions', {
     responses: {
       '200': {
@@ -92,9 +102,13 @@ export class CustomerTransactionController {
     transaction: Partial<Transaction>,
     @param.query.object('where', getWhereSchemaFor(Transaction)) where?: Where<Transaction>,
   ): Promise<Count> {
+    if (this.currentUser[securityId] !== id) {
+      throw new Error('Access denied: You can only update your own transactions');
+    }
     return this.customerRepository.transactions(id).patch(transaction, where);
   }
 
+  @authenticate('jwt')
   @del('/customers/{id}/transactions', {
     responses: {
       '200': {
@@ -107,6 +121,9 @@ export class CustomerTransactionController {
     @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Transaction)) where?: Where<Transaction>,
   ): Promise<Count> {
+    if (this.currentUser[securityId] !== id) {
+      throw new Error('Access denied: You can only delete your own transactions');
+    }
     return this.customerRepository.transactions(id).delete(where);
   }
 }

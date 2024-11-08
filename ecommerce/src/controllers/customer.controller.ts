@@ -22,7 +22,12 @@ import { CustomerRepository } from '../repositories';
 import { AuthService } from '../services';
 import { inject } from '@loopback/core';
 import { UserType } from '../utils/constants';
+import { authenticate } from '@loopback/authentication';
+import { SecurityBindings, securityId, UserProfile } from '@loopback/security';
+import { HttpErrors } from '@loopback/rest';
 
+
+@authenticate('jwt')
 export class CustomerController {
   constructor(
     @repository(CustomerRepository)
@@ -31,6 +36,7 @@ export class CustomerController {
     protected authService: AuthService,
   ) { }
 
+  @authenticate.skip()
   @post('/customers')
   @response(200, {
     description: 'Customer model instance',
@@ -52,76 +58,35 @@ export class CustomerController {
     return this.authService.register(customer, UserType.CUSTOMER);
   }
 
-  @get('/customers/count')
+  @get('/customers/profile')
   @response(200, {
-    description: 'Customer model count',
-    content: { 'application/json': { schema: CountSchema } },
-  })
-  async count(
-    @param.where(Customer) where?: Where<Customer>,
-  ): Promise<Count> {
-    return this.customerRepository.count(where);
-  }
-
-  @get('/customers')
-  @response(200, {
-    description: 'Array of Customer model instances',
-    content: {
-      'application/json': {
-        schema: {
-          type: 'array',
-          items: getModelSchemaRef(Customer, { includeRelations: true }),
-        },
-      },
-    },
-  })
-  async find(
-    @param.filter(Customer) filter?: Filter<Customer>,
-  ): Promise<Customer[]> {
-    return this.customerRepository.find(filter);
-  }
-
-  @patch('/customers')
-  @response(200, {
-    description: 'Customer PATCH success count',
-    content: { 'application/json': { schema: CountSchema } },
-  })
-  async updateAll(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Customer, { partial: true }),
-        },
-      },
-    })
-    customer: Customer,
-    @param.where(Customer) where?: Where<Customer>,
-  ): Promise<Count> {
-    return this.customerRepository.updateAll(customer, where);
-  }
-
-  @get('/customers/{id}')
-  @response(200, {
-    description: 'Customer model instance',
+    description: 'Customer profile',
     content: {
       'application/json': {
         schema: getModelSchemaRef(Customer, { includeRelations: true }),
       },
     },
   })
-  async findById(
-    @param.path.string('id') id: string,
-    @param.filter(Customer, { exclude: 'where' }) filter?: FilterExcludingWhere<Customer>
+  async getProfile(
+    @inject(SecurityBindings.USER) currentUserProfile: UserProfile,
   ): Promise<Customer> {
-    return this.customerRepository.findById(id, filter);
+    const userId = currentUserProfile[securityId];
+    if (!userId) {
+      throw new HttpErrors.Unauthorized('Invalid user profile');
+    }
+    const customer = await this.customerRepository.findById(userId);
+    if (!customer) {
+      throw new HttpErrors.NotFound('Customer not found');
+    }
+    return customer;
   }
 
-  @patch('/customers/{id}')
+  @patch('/customers/profile')
   @response(204, {
     description: 'Customer PATCH success',
   })
-  async updateById(
-    @param.path.string('id') id: string,
+  async updateProfile(
+    @inject(SecurityBindings.USER) currentUserProfile: UserProfile,
     @requestBody({
       content: {
         'application/json': {
@@ -129,27 +94,12 @@ export class CustomerController {
         },
       },
     })
-    customer: Customer,
+    customer: Partial<Customer>,
   ): Promise<void> {
-    await this.customerRepository.updateById(id, customer);
-  }
-
-  @put('/customers/{id}')
-  @response(204, {
-    description: 'Customer PUT success',
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() customer: Customer,
-  ): Promise<void> {
-    await this.customerRepository.replaceById(id, customer);
-  }
-
-  @del('/customers/{id}')
-  @response(204, {
-    description: 'Customer DELETE success',
-  })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.customerRepository.deleteById(id);
+    const userId = currentUserProfile[securityId];
+    if (!userId) {
+      throw new HttpErrors.Unauthorized('Invalid user profile');
+    }
+    await this.customerRepository.updateById(userId, customer);
   }
 }

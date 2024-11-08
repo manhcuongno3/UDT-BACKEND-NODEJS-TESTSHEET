@@ -1,7 +1,10 @@
-import {inject} from '@loopback/core';
-import {HttpErrors, post, requestBody} from '@loopback/rest';
-import {Credentials} from '../models';
-import {AuthService} from '../services/auth.service';
+import { authenticate } from '@loopback/authentication';
+import { inject } from '@loopback/core';
+import { HttpErrors, post, requestBody } from '@loopback/rest';
+import { authorize } from '../decorators/authorize.decorator';
+import { Credentials } from '../models';
+import { AuthService } from '../services/auth.service';
+import { UserType } from '../utils/constants';
 
 export class AuthController {
   constructor(
@@ -20,7 +23,10 @@ export class AuthController {
 
       return {token};
     } catch (error) {
-      throw new HttpErrors.Unauthorized('Invalid email or password');
+      if (error instanceof HttpErrors.Unauthorized) {
+        throw error;
+      }
+      throw new HttpErrors.InternalServerError('Error while logging in');
     }
   }
 }
