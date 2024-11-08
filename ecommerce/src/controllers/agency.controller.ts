@@ -22,7 +22,8 @@ import { AgencyRepository } from '../repositories';
 import { AuthService } from '../services';
 import { inject } from '@loopback/core';
 import { UserType } from '../utils/constants';
-import { authenticate, AuthenticationBindings } from '@loopback/authentication';
+import { authenticate } from '@loopback/authentication';
+import { sanitizeFilter } from '../decorators/sanitize-filter.decorator';
 
 @authenticate('jwt')
 export class AgencyController {
@@ -33,6 +34,7 @@ export class AgencyController {
     protected authService: AuthService,
   ) { }
 
+  @authenticate.skip()
   @post('/agencies')
   @response(200, {
     description: 'Agency model instance',
@@ -65,6 +67,7 @@ export class AgencyController {
     return this.agencyRepository.count(where);
   }
 
+  @authenticate.skip()
   @get('/agencies')
   @response(200, {
     description: 'Array of Agency model instances',
@@ -77,6 +80,7 @@ export class AgencyController {
       },
     },
   })
+  @sanitizeFilter()
   async find(
     @param.filter(Agency) filter?: Filter<Agency>,
   ): Promise<Agency[]> {
@@ -102,6 +106,7 @@ export class AgencyController {
     return this.agencyRepository.updateAll(agency, where);
   }
 
+  @authenticate.skip()
   @get('/agencies/{id}')
   @response(200, {
     description: 'Agency model instance',

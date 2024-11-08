@@ -25,6 +25,7 @@ import { UserType } from '../utils/constants';
 import { authenticate } from '@loopback/authentication';
 import { SecurityBindings, securityId, UserProfile } from '@loopback/security';
 import { HttpErrors } from '@loopback/rest';
+import { sanitizeFilter } from '../decorators/sanitize-filter.decorator';
 
 
 @authenticate('jwt')
@@ -101,5 +102,35 @@ export class CustomerController {
       throw new HttpErrors.Unauthorized('Invalid user profile');
     }
     await this.customerRepository.updateById(userId, customer);
+  }
+
+  @get('/customers')
+  @response(200, {
+    description: 'Array of Customer model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Customer, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  @sanitizeFilter()   
+  async find(
+    @param.filter(Customer) filter?: Filter<Customer>,
+  ): Promise<Customer[]> {
+    return this.customerRepository.find(filter);
+  }
+
+  @get('/customers/count')
+  @response(200, {
+    description: 'Customer model count',
+    content: {'application/json': {schema: CountSchema}},
+  })
+  async count(
+    @param.where(Customer) where?: Where<Customer>,
+  ): Promise<Count> {
+    return this.customerRepository.count(where);
   }
 }

@@ -23,6 +23,7 @@ import { authenticate, AuthenticationBindings } from '@loopback/authentication';
 import { UserProfile } from '@loopback/security';
 import { inject } from '@loopback/core';
 import { checkUserAccess } from '../helpers/access-control.helper';
+import { sanitizeFilter } from '../decorators/sanitize-filter.decorator';
 
 @authenticate('jwt')  
 export class TransactionController {
@@ -75,6 +76,7 @@ export class TransactionController {
       },
     },
   })
+  @sanitizeFilter() 
   async find(
     @param.filter(Transaction) filter?: Filter<Transaction>,
   ): Promise<Transaction[]> {

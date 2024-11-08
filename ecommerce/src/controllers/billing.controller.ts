@@ -19,7 +19,10 @@ import {
 } from '@loopback/rest';
 import {Billing} from '../models';
 import {BillingRepository} from '../repositories';
+import { authenticate } from '@loopback/authentication';
+import { sanitizeFilter } from '../decorators/sanitize-filter.decorator';
 
+@authenticate('jwt')
 export class BillingController {
   constructor(
     @repository(BillingRepository)
@@ -70,6 +73,7 @@ export class BillingController {
       },
     },
   })
+  @sanitizeFilter() 
   async find(
     @param.filter(Billing) filter?: Filter<Billing>,
   ): Promise<Billing[]> {
