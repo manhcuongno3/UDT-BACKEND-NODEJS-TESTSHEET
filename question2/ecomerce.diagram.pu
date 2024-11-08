@@ -1,0 +1,129 @@
+@startuml ecommerce
+entity "Customer" as customer{
+  * id : string <<PK>>
+  --
+  email : string
+  name : string
+  address : string
+  phoneNumber : string
+  gender : string
+  password: password
+  createdAt : date
+  updatedAt : date
+}
+
+entity "Agency" as agency{
+  * id : string <<PK>>
+  --
+  email : string
+  name : string
+  address : string
+  phoneNumber : string
+  gender : string
+  password: password
+  createdAt : date
+  updatedAt : date
+  --
+  adminId : string <<PK>>
+}
+
+entity "Admin" as admin{
+  * id: string <<PK>>
+  --
+  name: string
+  email: string
+  phone: string
+  password: password
+  createdAt : date
+  updatedAt : date
+}
+
+entity "Product" as product {
+  * id: string <<PK>>
+  --
+  name: string
+  description: string
+  price: number
+  stock: number
+  isHidden : bool
+  createdAt : date
+  updatedAt : date 
+  agencyId: string <<FK>>
+}
+
+entity "Cart" as cart {
+  * id: string <<PK>>
+  --
+  customerId: string <<FK>>
+}
+
+entity "CartItem" as cartItem {
+  * id: string <<PK>>
+  --
+  cartId: string <<FK>>
+  productId: string <<FK>>
+  quantity: number
+}
+
+entity "Transaction" as transaction {
+  * id: string <<PK>>
+  --
+  customerId: string <<FK>>
+  agencyId: string <<FK>>
+  status : string
+  createdDate: Date
+  totalAmount: number
+}
+
+entity "TransactionItem" as transactionItem {
+  * id: string <<PK>>
+  --
+  transactionId: string <<FK>>
+  productId: string <<FK>>
+  quantity: number
+  unitPrice: number
+}
+
+entity "Billing" as billing {
+  * id: string <<PK>>
+  --
+  transactionId: string <<FK>>
+  amount: number
+  createdDate: Date
+  paymentMethod: String
+  status: String
+}
+
+entity "CustomerTransaction" as customerTransaction {
+  * id: string <<PK>>
+  --
+  +customerId: string <<FK>>
+  +transactionId: string <<FK>>
+  --
+}
+
+entity "AgencyTransaction" as agencyTransaction {
+  * id: string <<PK>>
+  --
+  +agencyId: string <<FK>>
+  +transactionId: string <<FK>>
+}
+
+customer ||--|| cart : "has"
+cart ||--|{ cartItem : "contains"
+product ||--|{ cartItem : "is part of"
+
+agency ||--o{ product : "has"
+
+customer ||--o{ customerTransaction : "participates in"
+transaction ||--o{ customerTransaction : "includes"
+
+agency ||--o{ agencyTransaction : "participates in"
+transaction ||--o{ agencyTransaction : "includes"
+
+transaction ||--|| billing : "generates"
+transaction ||--o{ transactionItem : "contains"
+product ||--o{ transactionItem : "is included in"
+
+admin ||--o{ agency : "manages"
+@enduml
