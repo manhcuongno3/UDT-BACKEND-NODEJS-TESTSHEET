@@ -1,0 +1,35 @@
+@startuml CustomerSequenceDiagram
+actor Customer
+boundary Browser
+database AuthDB
+control AuthService
+control TransactionRepository
+control BillingRepository
+control AgencyRepository
+
+== Authentication Flow ==
+Customer -> Browser : Open Login Page
+Browser -> AuthService : Login with credentials
+AuthService -> AuthDB : Validate Credentials
+AuthDB --> AuthService : Response (success/fail)
+AuthService -> Browser : Sent auth token (JWT),store auth token in local storage
+
+== Authorization Flow ==
+Customer -> Browser : View Transactions
+Browser -> AuthService : Authenticate request with token
+AuthService -> TransactionRepository : Get customer’s transactions
+TransactionRepository --> AuthService : Return transaction data
+AuthService --> Browser : Display transactions
+
+Customer -> Browser : View Billing
+Browser -> AuthService : Authenticate request with token
+AuthService -> BillingRepository : Get customer’s billing data
+BillingRepository --> AuthService : Return billing data
+AuthService --> Browser : Display billing data
+
+Customer -> Browser : View Agency Information
+Browser -> AuthService : Authenticate request with token
+AuthService -> AgencyRepository : Get agency data
+AgencyRepository --> AuthService : Return agency data
+AuthService --> Browser : Display agency data
+@enduml

@@ -58,3 +58,19 @@ cần phải thay đổi các schema để tương thích
 > - npm install
 > - npm start 
 
+6. Test API
+> - access to http://localhost:3000/explorer
+
+### Question 4
+Diagram for authentication and authorize:
+#### Customer Sequence Diagram
+![Customer Sequence Diagram](question4/part1/customer.sequence.diagram.png)
+
+#### Agency Sequence Diagram
+  ![Agency Sequence Diagram](question4/part1/agency.sequence.diagram.png)
+
+#### Admin Sequence Diagram
+![Admin Sequence Diagram](question4/part1/admin.sequence.diagram.png)
+
+#### Persistent Authentication Sequence Diagram
+![Persistent Authentication Sequence Diagram](question4/part1/persistent-authentication.sequence.diagram.png)

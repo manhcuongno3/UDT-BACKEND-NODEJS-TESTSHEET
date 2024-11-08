@@ -1,0 +1,12 @@
+@startuml PersistentAuthenticationSequenceDiagram
+actor User
+boundary Browser
+database AuthDB
+control AuthService
+
+User -> Browser : Reopen Browser
+Browser -> AuthService : Check for stored token in local storage
+AuthService -> AuthDB : Verify token validity
+AuthDB --> AuthService : Response (valid/invalid)
+AuthService --> Browser : Restore session if valid, else prompt login
+@enduml
