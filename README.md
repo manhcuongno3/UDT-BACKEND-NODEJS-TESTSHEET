@@ -36,7 +36,7 @@ cần phải thay đổi các schema để tương thích
  - Hiệu suất: PostgreSQL sử dụng MVCC (Multi-Version Concurrency Control) để quản lý tính đồng thời. Khi một bản ghi được cập nhật, PostgreSQL sẽ tạo
  một bản ghi mới và giữ lại bản ghi cũ. Dẫn đến kích thước tăng nhanh. Các dữ liệu này cần được xử lý thường xuyên.
 
-3. docker-compose.yml file để chạy các database dưới local:
+3. docker-compose.yml file to run database locally:
 > - default username and password is admin
 > - default database name is ecommerce
 > - Start by steps:
@@ -62,7 +62,7 @@ cần phải thay đổi các schema để tương thích
 > - access to http://localhost:3000/explorer
 
 ### Question 4
-Diagram for authentication and authorize:
+1. Diagram for authentication and authorize:
 #### Customer Sequence Diagram
 ![Customer Sequence Diagram](question4/part1/customer.sequence.diagram.png)
 
@@ -74,3 +74,23 @@ Diagram for authentication and authorize:
 
 #### Persistent Authentication Sequence Diagram
 ![Persistent Authentication Sequence Diagram](question4/part1/persistent-authentication.sequence.diagram.png)
+
+2. Implement API for diagram
+> - git checkout feature/authenticate-authorize
+> - cd ecommerce
+> - npm install
+> - npm start
+
+3. Strong and weak points
+> - ### Strong points:
+> - JWT token-based authentication
+> - Token storage in local storage
+> - Authorization based on roles
+> - Token verification on each request
+> - Good microservices architecture approach
+> - Clear separation of responsibilities between different repositories
+> - Well-defined actors (Admin, Agency, Customer)
+> - ### Weak points:
+> - Storing JWT in local storage is vulnerable to XSS attack
+> - No refresh token mechanism shown
+> - No caching strategy visible
