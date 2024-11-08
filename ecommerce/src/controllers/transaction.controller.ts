@@ -24,8 +24,11 @@ import { UserProfile } from '@loopback/security';
 import { inject } from '@loopback/core';
 import { checkUserAccess } from '../helpers/access-control.helper';
 import { sanitizeFilter } from '../decorators/sanitize-filter.decorator';
+import { authorize } from '../decorators/authorize.decorator';
+import { UserType } from '../utils/constants';
 
 @authenticate('jwt')  
+@authorize(UserType.ADMIN)
 export class TransactionController {
   constructor(
     @repository(TransactionRepository)
