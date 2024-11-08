@@ -1,7 +1,12 @@
 ## UDT-BACKEND-NODEJS-TESTSHEET
 ### Installation
+### Run with docker
+> - download docker-compose.yml file from this repository 
+> - run command: docker compose up
+### Clone repository
 > - git clone https://github.com/manhcuongno3/UDT-BACKEND-NODEJS-TESTSHEET.git
 > - cd UDT-BACKEND-NODEJS-TESTSHEET
+
 
 ### Question 1
 > - cd question1
@@ -13,28 +18,25 @@
 
 ### Question 3
 
-1. Database sẽ sử dụng: PostgreSQL
-Sử dụng Redis cache để tối ưu hóa các tác vụ hay sử dụng.
+1. Database use: PostgreSQL
+> use Redis cache to optimize frequently used tasks.
 
-2. Lý do chọn PostgreSQL: 
-Bởi vì PostgreSQL là relational database, hỗ trợ foreign keys, relationships, indexing và transactions. Nếu sử dụng NoSQL, 
-cần phải thay đổi các schema để tương thích
+2. Reason for choosing PostgreSQL: 
+> Because PostgreSQL is a relational database, supports foreign keys, relationships, indexing and transactions. If using NoSQL, 
+> need to change schemas to be compatible.
 
-Điểm mạnh:
- - Toàn vẹn dữ liệu : Tham chiếu qua khóa ngoại để xử lý các relationships phức tạp.
- - Sử dụng SQL để truy vấn và cập nhật dữ liệu nhanh. Giúp các tác vụ phân tích báo cáo của agency và admin được tối ưu hóa.
- - Tuân thủ ACID(Atomicity, Consistency, Isolation, Durability), đảm bảo các transaction có độ tin cậy cao
- - Dữ liệu nhất quán: Tránh trùng lặp hoặc thừa dữ liệu ở các schema khi lưu vào database.
- - Bảo mật: Cung cấp kiểm soát dữ liệu dựa trên các quyền.
+> Strengths:
+> - Data integrity: Reference foreign keys to handle complex relationships.
+> - Use SQL to query and update data quickly. Help optimize agency and admin reporting tasks.
+> - Follow ACID (Atomicity, Consistency, Isolation, Durability), ensuring high reliability for transactions.
+> - Data consistency: Avoid duplicate or missing data in schemas when saving to the database.
+> - Security: Provides data control based on permissions.
 
-Điểm yếu: 
- - Learning Curve: Với các tác vụ như crud đơn giản các bản ghi thì không khó để làm được tuy nhiên với các tính năng nâng cao, phức tạp, tối ưu hóa 
- hiệu suất dựa trên thiết kế truy vấn đòi hỏi có mức độ hiểu biết sâu và nhiều kinh nghiệm.
- - Cấu hình phức tạp, yêu cầu các thiết lập để có thể triển khai và bảo trì.
- - Hạn chế mở rộng: Nếu hệ thống e-commerce lớn với hàng triệu bản ghi, PostgreSQL không có sharding tự dộng để phân tán dữ liệu qua nhiều máy 
- chủ (horizontal scaling). Cần phải cài đặt thủ công hoặc biện pháp bên ngoài.
- - Hiệu suất: PostgreSQL sử dụng MVCC (Multi-Version Concurrency Control) để quản lý tính đồng thời. Khi một bản ghi được cập nhật, PostgreSQL sẽ tạo
- một bản ghi mới và giữ lại bản ghi cũ. Dẫn đến kích thước tăng nhanh. Các dữ liệu này cần được xử lý thường xuyên.
+> Weaknesses: 
+> - Learning Curve: For s imple CRUD tasks, it's not difficult to do, but for advanced features, complex optimizations based on query design require a deep understanding and experience.
+> - Complex configuration, requiring setup to deploy and maintain.
+> - Limitation of scalability: If the e-commerce system is large with millions of records, PostgreSQL does not have automatic sharding to distribute data across multiple servers (horizontal scaling). Manual installation or external solutions are required.
+> - Performance: PostgreSQL uses MVCC (Multi-Version Concurrency Control) to manage concurrency. When a record is updated, PostgreSQL creates a new record and retains the old one. This leads to rapid growth in size. These data need to be processed regularly.
 
 3. docker-compose.yml file to run database locally:
 > - default username and password is admin
