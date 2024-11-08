@@ -10,3 +10,7 @@
 > - cd question1
 > - node rent-container-algorithm.js
 
+### Question 2
+> Diagram for ecosystem:
+> ![Ecommerce Diagram](question2/ecommerce.diagram.png)
+
