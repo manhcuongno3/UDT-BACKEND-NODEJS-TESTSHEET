@@ -37,12 +37,24 @@ cần phải thay đổi các schema để tương thích
  một bản ghi mới và giữ lại bản ghi cũ. Dẫn đến kích thước tăng nhanh. Các dữ liệu này cần được xử lý thường xuyên.
 
 3. docker-compose.yml file để chạy các database dưới local:
+> - default username and password is admin
+> - default database name is ecommerce
+> - Start by steps:
+> - Run docker desktop
 > - cd question3
-> - docker compose up
+> - docker compose up __or__ docker compose up -d POSTGRES_USER=your username POSTGRES_PASSWORD=your password POSTGRES_DB=your database name
 
 4. Set up Loopback 4
 > - git checkout feature/setup-loopback
 > - cd ecommerce
 > - npm install
 > - npm start
+
+5. Write API for feature for diagram
+> - git checkout feature/ecommerce-api
+> - cd ecommerce
+> - start database in docker
+> - migrate application with database by command: npm run migrate
+> - npm install
+> - npm start 
 

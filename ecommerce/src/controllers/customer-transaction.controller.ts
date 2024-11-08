@@ -19,16 +19,14 @@ import {
 } from '@loopback/rest';
 import {securityId, UserProfile} from '@loopback/security';
 import {
+  Customer,
   Transaction
 } from '../models';
 import {CustomerRepository} from '../repositories';
 
-@authenticate('jwt')
 export class CustomerTransactionController {
   constructor(
     @repository(CustomerRepository) protected customerRepository: CustomerRepository,
-    @inject(AuthenticationBindings.CURRENT_USER)
-    private currentUserProfile: UserProfile,
   ) { }
 
   @get('/customers/{id}/transactions', {
@@ -50,7 +48,7 @@ export class CustomerTransactionController {
     return this.customerRepository.transactions(id).find(filter);
   }
 
-  @post('/customers/transactions', {
+  @post('/customers/{id}/transactions', {
     responses: {
       '200': {
         description: 'create a Transaction model instance',
@@ -59,6 +57,7 @@ export class CustomerTransactionController {
     },
   })
   async create(
+    @param.path.string('id') id: typeof Customer.prototype.id,
     @requestBody({
       content: {
         'application/json': {
@@ -70,8 +69,7 @@ export class CustomerTransactionController {
       },
     }) transaction: Omit<Transaction, 'id'>,
   ): Promise<Transaction> {
-    const userId = this.currentUserProfile[securityId];
-    return this.customerRepository.transactions(userId).create(transaction);
+    return this.customerRepository.transactions(id).create(transaction);
   }
 
   @patch('/customers/{id}/transactions', {
