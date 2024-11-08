@@ -20,10 +20,15 @@ import {
   Product,
 } from '../models';
 import {AgencyRepository} from '../repositories';
-
+import { authenticate, AuthenticationBindings } from '@loopback/authentication';
+import { UserProfile } from '@loopback/security';
+import { inject } from '@loopback/core';
+import { checkUserAccess } from '../helpers/access-control.helper';
+@authenticate('jwt')
 export class AgencyProductController {
   constructor(
     @repository(AgencyRepository) protected agencyRepository: AgencyRepository,
+    @inject(AuthenticationBindings.CURRENT_USER) private currentUser: UserProfile,
   ) { }
 
   @get('/agencies/{id}/products', {
@@ -42,6 +47,7 @@ export class AgencyProductController {
     @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter<Product>,
   ): Promise<Product[]> {
+    checkUserAccess(this.currentUser, id);
     return this.agencyRepository.products(id).find(filter);
   }
 
@@ -54,7 +60,7 @@ export class AgencyProductController {
     },
   })
   async create(
-    @param.path.string('id') id: typeof Agency.prototype.id,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -67,6 +73,7 @@ export class AgencyProductController {
       },
     }) product: Omit<Product, 'id'>,
   ): Promise<Product> {
+    checkUserAccess(this.currentUser, id);
     return this.agencyRepository.products(id).create(product);
   }
 
@@ -90,6 +97,7 @@ export class AgencyProductController {
     product: Partial<Product>,
     @param.query.object('where', getWhereSchemaFor(Product)) where?: Where<Product>,
   ): Promise<Count> {
+    checkUserAccess(this.currentUser, id);
     return this.agencyRepository.products(id).patch(product, where);
   }
 
@@ -105,6 +113,7 @@ export class AgencyProductController {
     @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Product)) where?: Where<Product>,
   ): Promise<Count> {
+    checkUserAccess(this.currentUser, id);
     return this.agencyRepository.products(id).delete(where);
   }
 }

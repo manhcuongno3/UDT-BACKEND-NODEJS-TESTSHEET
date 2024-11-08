@@ -22,7 +22,9 @@ import { AgencyRepository } from '../repositories';
 import { AuthService } from '../services';
 import { inject } from '@loopback/core';
 import { UserType } from '../utils/constants';
+import { authenticate, AuthenticationBindings } from '@loopback/authentication';
 
+@authenticate('jwt')
 export class AgencyController {
   constructor(
     @repository(AgencyRepository)

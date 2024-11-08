@@ -21,10 +21,16 @@ AgencyTransaction,
 Transaction,
 } from '../models';
 import {AgencyRepository} from '../repositories';
+import { inject } from '@loopback/core';
+import { authenticate, AuthenticationBindings } from '@loopback/authentication';
+import { UserProfile } from '@loopback/security';
+import { checkUserAccess } from '../helpers/access-control.helper';
 
+@authenticate('jwt')
 export class AgencyTransactionController {
   constructor(
     @repository(AgencyRepository) protected agencyRepository: AgencyRepository,
+    @inject(AuthenticationBindings.CURRENT_USER) private currentUser: UserProfile,
   ) { }
 
   @get('/agencies/{id}/transactions', {
@@ -43,6 +49,7 @@ export class AgencyTransactionController {
     @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter<Transaction>,
   ): Promise<Transaction[]> {
+    checkUserAccess(this.currentUser, id);
     return this.agencyRepository.transactions(id).find(filter);
   }
 
@@ -55,7 +62,7 @@ export class AgencyTransactionController {
     },
   })
   async create(
-    @param.path.string('id') id: typeof Agency.prototype.id,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -67,6 +74,7 @@ export class AgencyTransactionController {
       },
     }) transaction: Omit<Transaction, 'id'>,
   ): Promise<Transaction> {
+    checkUserAccess(this.currentUser, id);
     return this.agencyRepository.transactions(id).create(transaction);
   }
 
@@ -90,6 +98,7 @@ export class AgencyTransactionController {
     transaction: Partial<Transaction>,
     @param.query.object('where', getWhereSchemaFor(Transaction)) where?: Where<Transaction>,
   ): Promise<Count> {
+    checkUserAccess(this.currentUser, id);
     return this.agencyRepository.transactions(id).patch(transaction, where);
   }
 
@@ -105,6 +114,7 @@ export class AgencyTransactionController {
     @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Transaction)) where?: Where<Transaction>,
   ): Promise<Count> {
+    checkUserAccess(this.currentUser, id);
     return this.agencyRepository.transactions(id).delete(where);
   }
 }

@@ -19,7 +19,12 @@ import {
 } from '@loopback/rest';
 import {Transaction} from '../models';
 import {TransactionRepository} from '../repositories';
+import { authenticate, AuthenticationBindings } from '@loopback/authentication';
+import { UserProfile } from '@loopback/security';
+import { inject } from '@loopback/core';
+import { checkUserAccess } from '../helpers/access-control.helper';
 
+@authenticate('jwt')  
 export class TransactionController {
   constructor(
     @repository(TransactionRepository)
